@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Workbench &mdash; patent idea map (imaginary example)</title>
+<style>
+:root{
+  --page:#f9f9f7; --surface:#ffffff; --band:#f2f2ee; --ink:#0b0b0b; --ink2:#52514e;
+  --muted:#8a8985; --border:#dcdbd6; --line:#c4c3bd;
+  --r0:#86b6ef; --r1:#5598e7; --r2:#2a78d6; --r3:#1c5cab; --r4:#104281;
+  --cmt:#004381; --cmt-bg:#e6eef7;
+  --prio:#c1272d; --prio-bg:#fdeceb; --draft:#6b6a63; --draft-bg:#e8e7e2;
+  --high:#a86800; --high-bg:#fdf3dc; --accent:#1c5cab; --grant:#00785f;
+  --v0:#eef4fb; --v1:#d9e7f7; --v2:#bcd4f0; --v3:#94b9e6; --v4:#6c9bd8; --v5:#4a7fc4; --v6:#2f66b0; --rim:#7fa6d9; --swirl:rgba(28,92,171,.13);
+}
+@media (prefers-color-scheme:dark){:root{
+  --page:#0d0d0d; --surface:#1a1a19; --band:#141413; --ink:#fff; --ink2:#c3c2b7;
+  --muted:#8f8e86; --border:#33332f; --line:#45453f;
+  --r0:#2a78d6; --r1:#2a78d6; --r2:#3987e5; --r3:#5598e7; --r4:#86b6ef;
+  --cmt:#6fa8ff; --cmt-bg:#16243a;
+  --prio:#ff8a85; --prio-bg:#3a1d1c; --draft:#a8a79d; --draft-bg:#2b2b28;
+  --high:#f0b542; --high-bg:#372c11; --accent:#86b6ef; --grant:#4fd1ae;
+  --v0:#121a24; --v1:#15212f; --v2:#18283b; --v3:#1b3048; --v4:#1e3856; --v5:#224066; --v6:#264876; --rim:#3d5f8c; --swirl:rgba(134,182,239,.12);}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);
+  font:14px/1.5 "Segoe UI",Arial,Helvetica,sans-serif;-webkit-text-size-adjust:100%}
+.wrap{padding:0 16px 24px}
+header.top{position:sticky;top:0;z-index:30;background:var(--page);
+  border-bottom:1px solid var(--border);padding:13px 0 11px;margin-bottom:14px}
+h1{margin:0 0 3px;font-size:20px;letter-spacing:-.2px}
+.sub{color:var(--ink2);font-size:12.5px;margin-bottom:10px}
+.controls{display:flex;flex-wrap:wrap;gap:9px 16px;align-items:center}
+.ctl{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink2)}
+input[type=search]{padding:6px 10px;border:1px solid var(--border);border-radius:7px;
+  background:var(--surface);color:var(--ink);font:inherit;font-size:13px;min-width:180px}
+input[type=range]{width:120px;accent-color:var(--accent)}
+.key{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink2)}
+.sw{width:13px;height:13px;border-radius:3px;flex:none;border:1px solid}
+.sw.p{background:var(--prio-bg);border-color:var(--prio)}
+.sw.d{background:var(--draft-bg);border-color:var(--draft)}
+.sw.h{background:var(--high-bg);border-color:var(--high)}
+.sw.i{background:var(--prio-bg);border-color:var(--prio)}
+.sw.b{background:linear-gradient(135deg,var(--prio-bg) 0 60%,var(--high-bg) 60% 100%);border-color:var(--prio)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;flex-basis:100%;border-top:1px dashed var(--border);padding-top:7px}
+.legend .lt{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)}
+.scale{display:inline-flex;gap:2px}.scale i{width:15px;height:11px;border-radius:2px;display:inline-block}
+.layout{display:flex;gap:16px;align-items:flex-start}
+main{flex:1 1 auto}
+.vx{flex:none;width:400px;border:1px solid var(--border);border-radius:12px;background:var(--surface);padding:12px 8px 12px}
+.vtot{text-align:center;font-size:14px;color:var(--ink2);padding:2px 0 8px;margin-bottom:8px;border-bottom:1px solid var(--border)}
+.vtot b{font-size:22px;color:var(--ink);margin:0 2px}
+.vtot span{font-size:13px}
+.vh{font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--ink2);text-align:center;margin-bottom:6px}
+.vstage{position:relative;display:flex;flex-direction:column;align-items:center;gap:18px;padding:10px 0 14px}
+svg.vfunnel{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.vband{position:relative;z-index:1;padding:14px 12px 10px;text-align:center;cursor:pointer;border-radius:10px}
+.vband:focus-visible{outline:2px solid var(--accent)}
+.vband.on .vl{text-decoration:underline;text-underline-offset:3px}
+.vl{font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--cmt);margin-bottom:4px}
+.vq{font-size:13px;color:var(--ink2)}.vq b{font-size:26px;color:var(--ink);margin-right:3px}
+.vempty{border:1.5px dashed var(--rim);border-radius:8px;padding:6px 8px;font-size:11.5px;color:var(--ink2)}
+.vchips{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:6px}
+.vchip{display:flex;flex-direction:column;gap:2px;text-align:left;background:var(--surface);color:var(--ink);font:inherit;
+  border:1px solid var(--border);border-left:4px solid var(--cmt);border-radius:7px;padding:4px 6px;cursor:pointer}
+.vchip.is-high{border-left-color:var(--high);background:var(--high-bg)}
+.vchip.is-imp{border-left-color:var(--prio);background:var(--prio-bg)}
+.vchip.is-imp.is-high{background:linear-gradient(135deg,var(--prio-bg) 0 60%,var(--high-bg) 60% 100%)}
+.vchip:hover,.vchip:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.vd{font-size:9px;font-weight:700;color:#fff;background:var(--cmt);border-radius:3px;padding:0 4px;align-self:flex-start}
+.vt{font-size:11px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.vhold{margin:6px auto 0;width:300px;border:1px dashed var(--border);background:var(--band);font-size:12px;color:var(--ink2);padding:7px}
+.vband[data-status="Filed"] .vl,.vband[data-status="Granted"] .vl{color:#fff}
+.vband[data-status="Filed"] .vempty,.vband[data-status="Granted"] .vempty{color:#eef4fb;border-color:rgba(255,255,255,.6)}
+.vband[data-status="Filed"] .vq,.vband[data-status="Granted"] .vq,.vband[data-status="Filed"] .vq b,.vband[data-status="Granted"] .vq b{color:#fff}
+.vnote{font-size:10.5px;color:var(--muted);text-align:center;margin-top:8px;line-height:1.4}
+@media(max-width:900px){.layout{flex-direction:column;align-items:stretch}.vx{width:100%}main{width:100%}header.top{position:static}.vband{max-width:100%}}
+main{min-width:0}
+.sizer{position:relative;overflow:hidden}
+.viewport{overflow:auto;min-width:0;max-width:100%;border:1px solid var(--border);
+  border-radius:12px;background:var(--band);position:relative;
+  overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.canvas{transform-origin:0 0;padding:26px}
+.grow{display:flex;gap:44px;align-items:flex-start;margin-bottom:34px}
+.grow:last-child{margin-bottom:0}
+.group{flex:none;transition:opacity .15s,filter .15s}
+.group.gdim{filter:grayscale(1);opacity:.4}
+.ccol.cdim .cnode{filter:grayscale(1);opacity:.4}
+.group.gdim .ccol.cdim .cnode{filter:none;opacity:1}
+.ghead{text-align:center;padding-bottom:7px;border-bottom:2px solid var(--line);
+  margin-bottom:0}
+h2{margin:0;font-size:16.5px}
+.gmeta{display:block;color:var(--muted);font-size:11.5px;margin-top:1px}
+.crow{display:grid;grid-auto-flow:column;grid-auto-columns:300px;gap:14px;
+  position:relative;padding-top:30px}
+.crow::before{content:"";position:absolute;top:15px;left:150px;right:150px;
+  height:1px;background:var(--line)}
+.crow::after{content:"";position:absolute;top:0;left:50%;width:1px;height:15px;
+  background:var(--line)}
+.group.solo .crow::before{display:none}
+.ccol{position:relative}
+.ccol::before{content:"";position:absolute;top:-15px;left:50%;width:1px;height:15px;
+  background:var(--line)}
+.cnode{background:var(--surface);border:1.5px solid #b9c6da;border-radius:9px;padding:9px 11px}
+@media(prefers-color-scheme:dark){.cnode{border-color:#3c536f}}
+h3{margin:0 0 5px;font-size:13px;line-height:1.3}
+.cmeta{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.cmeta > span:first-child{color:var(--muted);font-size:11px}
+.cev{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);white-space:nowrap}
+.leaves{position:relative;margin-top:22px;padding-left:16px}
+.leaves::before{content:"";position:absolute;left:0;top:-22px;bottom:24px;width:1px;
+  background:var(--line)}
+.idea{position:relative;display:flex;align-items:center;gap:7px;width:100%;text-align:left;
+  background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--border);
+  border-radius:6px;padding:6px 8px;margin-bottom:7px;cursor:pointer;font:inherit;
+  color:var(--ink);transition:border-color .12s,box-shadow .12s}
+.idea:last-child{margin-bottom:0}
+.idea::before{content:"";position:absolute;left:-16px;top:50%;width:12px;height:1px;
+  background:var(--line)}
+.idea:hover,.idea:focus-visible{border-color:var(--accent);outline:none;
+  box-shadow:0 1px 7px rgba(0,0,0,.11)}
+.idea[aria-current=true]{box-shadow:0 0 0 2px var(--accent) inset;border-color:var(--accent)}
+.idea .n{color:var(--muted);font-size:10.5px;min-width:18px;flex:none}
+.idea .t{flex:1;font-size:12px;line-height:1.32}
+.badges{flex:none}
+.tag{font-size:8.5px;font-weight:700;letter-spacing:.4px;padding:2px 4px;border-radius:4px;
+  border:1px solid currentColor;white-space:nowrap}
+.tag.p{color:var(--prio)}.tag.h{color:var(--high)}.tag.i{color:var(--prio)}
+.tag.d{color:var(--draft)}
+.tag.c{color:#fff;background:var(--cmt);border-color:var(--cmt)}
+.idea.is-cmt{outline:2px solid var(--cmt);outline-offset:1px}
+.sw.c{background:transparent;border:2px solid var(--cmt)}
+.d-flag.c{border-left-color:var(--cmt);background:var(--cmt-bg)}
+.pill{flex:none;font-size:11px;font-weight:700;color:#fff;padding:2px 6px;border-radius:5px}
+.idea{flex-wrap:wrap}
+.idea .t{flex:1 1 calc(100% - 30px)}
+.idea .sec{order:3;flex-basis:100%;display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  border-top:1px solid var(--border);padding-top:4px;margin-top:3px}
+.idea .sec + .sec{order:4;margin-top:0}
+.idea .sl{font-size:8.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);min-width:62px}
+.pills{display:flex;gap:4px;flex:none;margin-left:auto}
+.badges{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px;margin-left:auto;max-width:100%}
+.badges:empty{display:none}
+.pill.s{font-size:10px;padding:2px 5px}
+.pill.ca{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.55)}
+.idea .st{font-size:10.5px;line-height:1.25;color:var(--ink2)}
+.idea .st.c{color:var(--cmt);font-weight:700}
+.idea .st.a{color:var(--draft);font-weight:700}
+.idea .st.g{color:var(--grant);font-weight:700}
+.idea .st.o{font-style:italic}
+.d-sec{border:1px solid var(--border);border-radius:10px;padding:10px 12px 2px;margin:0 0 14px}
+.d-sec > .d-sh{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--accent);margin:0 0 8px}
+.d-status{font-size:13px;margin:0 0 10px;color:var(--ink2)}
+.d-status b{color:var(--ink)}
+.d-ca{background:var(--band);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12.5px;line-height:1.45;margin-bottom:12px}
+.pill.r0{background:var(--r0);color:#0b0b0b}.pill.r1{background:var(--r1);color:#0b0b0b}
+.pill.r2{background:var(--r2)}.pill.r3{background:var(--r3)}.pill.r4{background:var(--r4)}
+.idea.is-prio{border-left-color:var(--prio);background:var(--prio-bg)}
+.idea.is-draft{border-left-color:var(--draft);background:var(--draft-bg)}
+.idea.is-high{border-left-color:var(--high);background:var(--high-bg)}
+.idea.is-imp{border-left-color:var(--prio);background:var(--prio-bg)}
+.idea.is-imp.is-high{background:linear-gradient(135deg,var(--prio-bg) 0 60%,var(--high-bg) 60% 100%)}
+.idea.dim{opacity:.24}
+.backdrop{position:fixed;inset:0;background:rgba(11,11,11,.55);z-index:60;
+  display:none;align-items:center;justify-content:center;padding:20px}
+.backdrop.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  width:min(660px,100%);max-height:min(86vh,860px);overflow:auto;padding:22px 24px 24px;
+  box-shadow:0 18px 60px rgba(0,0,0,.34);position:relative}
+@media(max-width:560px){.modal{padding:18px 16px 20px;border-radius:12px}}
+#close{position:absolute;top:10px;right:12px;background:none;border:0;font-size:26px;
+  line-height:1;color:var(--muted);cursor:pointer;padding:2px 6px;border-radius:6px}
+#close:hover{background:var(--band);color:var(--ink)}
+.mnav{display:flex;gap:8px;align-items:center;margin-top:18px;padding-top:14px;
+  border-top:1px solid var(--border)}
+.mnav button{font:inherit;font-size:12px;padding:5px 11px;border-radius:7px;
+  border:1px solid var(--border);background:var(--surface);color:var(--ink2);cursor:pointer}
+.mnav button:hover:not(:disabled){border-color:var(--accent);color:var(--ink)}
+.mnav button:disabled{opacity:.4;cursor:default}
+.mnav .hint{margin-left:auto;font-size:11px;color:var(--muted)}
+.d-empty{color:var(--muted);font-size:13px}
+.d-no{color:var(--muted);font-size:11px;letter-spacing:.5px}
+.d-title{font-size:19px;font-weight:700;margin:3px 0 7px;line-height:1.3}
+.d-pt{font-size:15px;font-weight:700;line-height:1.35;margin:2px 0 10px;text-transform:uppercase;letter-spacing:.2px}
+.d-abs{font-size:14.5px;line-height:1.55;margin:2px 0 12px;padding:10px 12px;border-left:3px solid var(--accent);
+  background:var(--band);border-radius:0 8px 8px 0}
+.d-path{font-size:11.5px;color:var(--ink2);margin-bottom:10px}
+.d-path b{color:var(--ink)}
+.d-fam{display:inline-block;font-size:11px;color:#7a6a1f;background:#fdf3dc;
+  border:1px solid #e3cf94;border-radius:5px;padding:2px 7px;margin-bottom:10px}
+@media(prefers-color-scheme:dark){.d-fam{color:#f0d68a;background:#31290f;
+  border-color:#5c4d1c}}
+.d-flag{border-left:3px solid var(--prio);background:var(--prio-bg);color:var(--ink);
+  padding:8px 10px;border-radius:0 7px 7px 0;font-size:12.5px;margin-bottom:11px}
+.d-flag.h{border-left-color:var(--high);background:var(--high-bg)}
+.d-flag.d{border-left-color:var(--draft);background:var(--draft-bg)}
+.d-sum{font-size:14px;line-height:1.62;margin-bottom:14px}
+.d-scores{display:flex;gap:7px;margin-bottom:12px}
+.sc{flex:1;background:var(--band);border:1px solid var(--border);border-radius:8px;
+  padding:6px 8px;text-align:center}
+.sc span{display:block;font-size:10px;color:var(--muted);line-height:1.25}
+.sc b{font-size:19px}
+.d-lab{font-size:10px;letter-spacing:.6px;color:var(--muted);text-transform:uppercase;
+  margin:11px 0 3px}
+.d-val{font-size:12.5px;color:var(--ink2);line-height:1.5;word-break:break-word}
+.d-notes{background:var(--cmt-bg);border-left:3px solid var(--cmt);padding:8px 10px;border-radius:6px;color:var(--ink)}
+footer{margin-top:16px;color:var(--muted);font-size:11.5px;line-height:1.6}
+/* ---- print: one page at the diagram's natural size; Ctrl+P gives the same picture as the screen ---- */
+@media print{
+  :root{--page:#ffffff;--band:#f4f4f1}
+  body{background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .wrap{padding:0 12px}
+  header.top{position:static;border:none;padding:8px 0 4px}
+  .controls,.mnav,#close{display:none!important}
+  .backdrop{display:none!important}
+  .viewport{overflow:visible!important;height:auto!important;max-width:none;border:none;border-radius:0}
+  .sizer{overflow:visible!important;width:auto!important;height:auto!important}
+  .canvas{transform:none!important}
+  .idea.dim{opacity:1}
+  footer{margin-top:8px}
+}
+
+.idea > .badges{order:5;flex:1 1 100%;justify-content:flex-end;margin:2px 0 0}
+.vstage .vhold{position:absolute;right:0;width:104px;margin:0;padding:7px 6px;font-size:11.5px;line-height:1.35;text-align:center;z-index:2}
+.ghead h2 svg{width:26px;height:26px;vertical-align:-6px;margin-right:9px;fill:none;stroke:var(--accent);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---- fit the whole page to the screen ---- */
+.vstage{gap:7px;padding:6px 0 8px}
+.vband{padding:8px 10px 6px}
+.vq b{font-size:22px}
+.vtot{padding:0 0 5px;margin-bottom:5px}
+.vh{margin-bottom:2px}
+.vnote{margin-top:4px}
+header.top{padding:9px 0 8px;margin-bottom:10px}
+h1{font-size:18px}
+.sub{margin-bottom:6px}
+.legend{padding-top:5px}
+@media print{.wrap{zoom:1!important}}
+.canvas{padding:16px 18px}
+.crow{padding-top:24px}.crow::before{top:12px}.crow::after{height:12px}.ccol::before{top:-12px;height:12px}
+.leaves{margin-top:14px}.leaves::before{top:-14px}
+.idea{padding:4px 7px;margin-bottom:5px}
+.idea .t{line-height:1.25}
+.idea .sec{padding-top:2px;margin-top:2px}
+.ghead{padding-bottom:4px}
+details.about{font-size:12px;color:var(--ink2);margin:-2px 0 6px}
+details.about summary{cursor:pointer;color:var(--accent)}
+</style></head><body>
+<div class="wrap">
+<header class="top">
+  <h1>Workbench &mdash; patent idea map (imaginary example) <span style="font-size:13px;font-weight:400;color:var(--muted);letter-spacing:0;margin-left:10px">Created by Stanislav Aleksandrov</span></h1>
+  <div class="sub" style="font-weight:700;color:var(--ink);font-size:20px;letter-spacing:-.2px;line-height:1.3;margin-bottom:6px">Workbench: a platform for the software of autonomous field robots, from the first line of code to the robot at work</div>
+  <div class="sub">Imaginary example: Brightmoor Robotics, its Workbench project, the people, the meetings and all 20 ideas are invented to show the method. 20 ideas in 5 clusters, from the recorded patent sessions of February &ndash; May 2026.</div>
+  <details class="about"><summary>How to read the cards</summary>Idea titles are in USPTO style; click any idea to open its abstract and the notes from the transcription in a pop-up window. Each card shows N = novelty / non-obviousness, C = completeness for filing, R = readiness, Impact = business impact, that is, competitive advantage for Workbench. Only the first idea under each cluster and idea 17, the first item of the committee deck, are filled in completely; for the other ideas the card shows the evaluation and the status, and the abstract, notes, people and sources are left empty.</details>
+  <div class="controls">
+    <input type="search" id="q" placeholder="Search title, summary, person&hellip;"
+           aria-label="Search ideas">
+    <span class="ctl"><label for="thr">Highlight readiness above</label>
+      <input type="range" id="thr" min="4" max="7.5" step="0.5" value="7">
+      <b id="thrv">7.0</b> <span id="thrn"></span></span>
+    <span class="ctl"><label for="thr2">Highlight business impact above</label>
+      <input type="range" id="thr2" min="3" max="9" step="1" value="7">
+      <b id="thr2v">7</b> <span id="thr2n"></span></span>
+    <span class="ctl">Show
+      <label><input type="radio" name="mode" value="all" checked> all</label>
+      <label><input type="radio" name="mode" value="cmt"> committee deck</label>
+      <label><input type="radio" name="mode" value="prio"> Okafor&rsquo;s</label>
+      <label><input type="radio" name="mode" value="high"> flagged</label></span>
+    <span class="ctl"><label for="stsel">Status</label>
+      <select id="stsel"><option value="">all</option><option value="Under consideration">Under consideration (12)</option><option value="On hold">On hold (2)</option><option value="Preparing slide for Patent committee">Preparing slide for Patent committee (4)</option><option value="Patent committee consideration">Patent committee consideration (0)</option><option value="IDF preparation">IDF preparation (0)</option><option value="Drafting">Drafting (2)</option><option value="Filed">Filed (0)</option><option value="Granted">Granted (0)</option></select></span>
+    <span class="ctl"><label for="zoom">Zoom</label>
+      <input type="range" id="zoom" min="0.35" max="1" step="0.01" value="1">
+      <b id="zv">100%</b>
+      <button type="button" id="fit">fit</button><button type="button" id="reset">100%</button></span>
+    <div class="legend"><span class="lt">Colours</span>
+      <span class="key"><span class="sw i"></span> red: business impact above its threshold</span>
+      <span class="key"><span class="sw h"></span> yellow: readiness for patenting above its threshold</span>
+      <span class="key"><span class="sw b"></span> red and yellow: both</span>
+      <span class="key"><span class="sw c"></span> blue frame: in the patent-committee deck</span>
+      <span class="key"><span class="sw d"></span> grey: with the patent agents (drafting, filed)</span>
+      <span class="key"><span class="scale"><i style="background:var(--r0)"></i><i style="background:var(--r1)"></i><i style="background:var(--r2)"></i><i style="background:var(--r3)"></i><i style="background:var(--r4)"></i></span> score badges: light = low, dark = high</span></div>
+  </div>
+</header>
+<div class="layout">
+  <aside class="vx" aria-label="Ideas by status"><div class="vtot" title="Ideas shown on the map plus ideas merged into them">Total harvested: <b>22</b> <span>(merged: 2)</span></div><div class="vh">Ideas by status</div><div class="vstage"><svg class="vfunnel" aria-hidden="true"></svg><section class="vband" data-status="Under consideration" style="width:384px" tabindex="0" title="Show these ideas on the map"><div class="vl">Under consideration</div><div class="vq"><b>12</b> ideas</div></section><section class="vband vcmt" data-status="Preparing slide for Patent committee" style="width:340px" tabindex="0" title="Show these ideas on the map"><div class="vl">Patent committee preparation</div><div class="vq"><b>4</b> ideas</div><div class="vchips"><button class="vchip" data-no="17" data-ready="7.5" data-ca="9" title="Method for Delivering Software Updates to Robots With Intermittent Connectivity by Robot-to-Robot Relay"><span class="vd">Deck item 1</span><span class="vt"><b>17</b> Robot-to-robot relay</span></button><button class="vchip" data-no="13" data-ready="7.5" data-ca="8" title="Method for Rolling Out a Software Update to a Robot Fleet in Stages Ordered by Each Robot's Task Risk and Battery State"><span class="vd">Deck item 2</span><span class="vt"><b>13</b> Risk-ordered staged rollout</span></button><button class="vchip" data-no="12" data-ready="7.0" data-ca="8" title="Method for Generating a Safety Test Set for a Robot Software Release From the Robot's Safety Requirements and Recent Incidents"><span class="vd">Deck item 3</span><span class="vt"><b>12</b> Safety test set generator</span></button><button class="vchip" data-no="3" data-ready="7.0" data-ca="8" title="Method for Selecting Which Simulation Tests to Run Based on the Code Changed and the Robot Parts Affected"><span class="vd">Deck item 4</span><span class="vt"><b>3</b> Change-aware test selection</span></button></div></section><section class="vband" data-status="Patent committee consideration" style="width:268px" tabindex="0" title="Show these ideas on the map"><div class="vl">Patent committee consideration</div><div class="vempty">none yet</div></section><section class="vband" data-status="IDF preparation" style="width:214px" tabindex="0" title="Show these ideas on the map"><div class="vl">IDF preparation</div><div class="vempty">none yet</div></section><section class="vband" data-status="Drafting" style="width:176px" tabindex="0" title="Show these ideas on the map"><div class="vl">Drafting</div><div class="vq"><b>2</b> ideas</div></section><section class="vband" data-status="Filed" style="width:142px" tabindex="0" title="Show these ideas on the map"><div class="vl">Filed</div><div class="vempty">none yet</div></section><section class="vband" data-status="Granted" style="width:104px" tabindex="0" title="Show these ideas on the map"><div class="vl">Granted</div><div class="vempty">none yet</div></section><div class="vhold vband" data-status="On hold" tabindex="0" title="Show these ideas on the map">Set aside, on hold: <b>2</b> ideas</div></div><div class="vnote">Click a stage to show its ideas on the map; click it again to show all. Only the ideas being prepared for the patent committee are named.</div></aside>
+  <main>
+    <div class="viewport" id="viewport"><div class="sizer" id="sizer"><div class="canvas" id="canvas"><div class="grow"><section class="group" style="width:928px"><div class="ghead"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="3.5" width="19" height="13" rx="2"/><path d="M8 21h8M12 16.5V21"/><path d="M9 7.8 6.6 10 9 12.2M15 7.8l2.4 2.2-2.4 2.2M13 7.2l-2 5.6"/></svg>Development environment</h2><span class="gmeta">12 ideas &middot; 3 clusters &middot; average readiness for patenting R 5.8</span></div><div class="crow"><div class="ccol"><div class="cnode"><h3>Builds and test selection</h3><div class="cmeta"><span>3 ideas</span><span class="cev">Average readiness for patenting <span class="pill r3" title="Average readiness for patenting of the ideas in this cluster">R 6.2</span></span></div></div><div class="leaves"><button class="idea" data-no="1" data-ready="6.3" data-ca="4"><span class="n">1</span><span class="t">Method for Compiling One Robot Software Build for Multiple Hardware Revisions Using a Capability Manifest</span><span class="sec"><span class="sl">Evaluation</span><span class="pills"><span class="pill s r2" title="Novelty / non-obviousness">N 5</span><span class="pill s r4" title="Completeness for filing">C 8</span><span class="pill r3" title="Readiness for drafting">R 6.3</span><span class="pill s ca r1" title="Business impact (competitive advantage for Workbench): Low">Impact 4</span></span></span><span class="sec"><span class="sl">Status</span><span class="st u">Under consideration</span></span><span class="badges"></span></button><button class="idea" data-no="2" data-ready="5.3" data-ca="2"><span class="n">2</span><span class="t">System for Detecting a Hardware Revision Mismatch at Build Time From Part Serial Numbers</span><span class="sec"><span class="sl">Evaluation</span><span class="pills"><span class="pill s r1" title="Novelty / non-obviousness">N 4</span><span class="pill s r4" title="Completeness for filing">C 7</span><span class="pill r2" title="Readiness for drafting">R 5.3</span><span class="pill s ca r0" title="Business impact (competitive advantage for Workbench): Very low">Impact 2</span></span></span><span class="sec"><span class="sl">Status</span><span class="st u">Under consideration</span></span><span class="badges"></span></button><button class="idea" data-no="3" data-ready="7.0" data-ca="8" data-cmt="4"><span class="n">3</span><span class="t">Method for Selecting Which Simulation Tests to Run Based on the Code Changed and the Robot Parts Affected</span><span class="sec"><span class="sl">Evaluation</span><span class="pills"><span class="pill s r4" title="Novelty / non-obviousness">N 7</span><span class="pill s r4" title="Completeness for filing">C 7</span><span class="pill r4" title="Readiness for drafting">R 7.0</span><span class="pill s ca r4" title="Business impact (competitive advantage for Workbench): High">Impact 8</span></span></span><span class="sec"><span class="sl">Status</span><span class="st c">Preparing slide for Patent committee</span></span><span class="badges"></span></button></div></div><div class="ccol"><div class="cnode"><h3>Developer assistance</h3><div class="cmeta"><span>3 ideas</span><span class="cev">Average readiness for patenting <span class="pill r3" title="Average readiness for patenting of the ideas in this cluster">R 5.6</span></span></div></div><div class="leaves"><button class="idea" data-no="4" data-ready="4.9" data-ca="6"><span class="n">4</span><span class="t">System for Proposing Code Changes From a Robot Behaviour Description and Verifying Them in Simulation Before Presentation</span><span class="sec"><span class="sl">Evaluation</span><span class="pills"><span class="pill s r3" title="Novelty / non-obviousness">N 6</span><span class="pill s r1" title="Completeness for filing">C 4</span><span class="pill r1" title="Readiness for drafting">R 4.9</span><span class="pill s ca r3" title="Business impact (competitive advantage for Workbench): Medium-high">Impact 6</span></span></span><span class="sec"><span class="sl">Status</span><span class="st u">Under consideration</span></span><span class="badges"></span></button><button class="idea" data-no="5" data-ready="5.9" data-ca="8" data-prio="1"><span class="n">5</span><span class="t">Method for Explaining a Failed Simulation Run by Linking the Failure to the Code Change Most Likely Responsible</span><span class="sec"><span class="sl">Evaluation</span><span class="pills"><span class="pill s r4" title="Novelty / non-obviousness">N 7</span><span class="pill s r2" title="Completeness for filing">C 5</span><span class="pill r3" title="Readiness for drafting">R 5.9</span><span class="pill s ca r4" title="Business impact (competitive advantage for Workbench): High">Impact 8</span></span></span><span class="sec"><span class="sl">Status</span><span class="st u">Under consideration</span></span><span class="badges"></span></button><button class="idea" data-no="6" data-ready="6.0" data-ca="8"><span class="n">6</span><span class="t">System for Linking a Hardware Design Change to the Software Modules and Tests It Affects</span><span class="sec"><span class="sl">Evaluation</span><span class="pills"><span class="pill s r3" title="Novelty / non-obviousness">N 6</span><span class="pill s r3" title="Completeness for filing">C 6</span><span class="pill r3" title="Readiness for drafting">R 6.0</span><span class="pill s ca r4" title="Business impact (competitive advantage for Workbench): High">Impact 8</span></span></span><span class="sec"><span class="sl">Status</span><span class="st u">Under consideration</span></span><span class="badges"></span></button></div></div><div class="ccol"><div class="cnode"><h3>Simulation</h3><div class="cmeta"><span>6 ideas</span><span class="cev">Average readiness for patenting <span class="pill r3" title="Average readiness for patenting of the ideas in this cluster">R 5.8</span></span></div></div><div class="leaves"><button class="idea" data-no="7" data-ready="7.0" data-ca="7" data-draft="1"><span class="n">7</span><span class="t">System and Method for Calibrating a Robot Simulation Model Using Logged Sensor Data From Deployed Robots</span><span class="sec"><span class="sl">Evaluation</span><span class="pills"><span class="pill s r4" title="Novelty / non-obviousness">N 7</span><span class="pill s r4" title="Completeness for filing">C 7</span><span class="pill r4" title="Readiness for drafting">R 7.0</span><span class="pill s ca r4" title="Business impact (competitive advantage for Workbench): High">Impact 7</span></span></span><span class="sec"><span class="sl">Status</span><span class="st a">Drafting</span></span><span class="badges"></span></button><button class="idea" data-no="8" data-ready="6.3" data-ca="7"><span class="n">8</span><span class="t">Method for Generating Edge-Case Test Scenarios for Robot Software From Recorded Near-Miss Events</span><span class="sec"><span class="sl">Evaluation</span><span class="pills"><span class="pill s r4" title="Novelty / non-obviousness">N 8</span><span class="pill s r2" title="Completeness for filing">C 5</span><span class="pill r3" title="Readiness for drafting">R 6.3</span><span class="pill s ca r4" title="Business impact (competitive advantage for Workbench): High">Impact 7</span></span></span><span class="sec"><span class="sl">Status</span><span class="st u">Under consideration</span></span><span class="badges"></span></button><button class="idea" data-no="9" data-ready="5.5" data-ca="5"><span class="n">9</span><span class="t">System for Estimating the Gap Between Simulated and Real Sensor Readings and Flagging Untrustworthy Test Results</span><span class="sec"><span class="sl">Evaluation</span><span class="pills"><span class="pill s r3" title="Novelty / non-obviousness">N 6</span><span class="pill s r2" title="Completeness for filing">C 5</span><span class="pill r3" title="Readiness for drafting">R 5.5</span><span class="pill s ca r2" title="Business impact (competitive advantage for Workbench): Medium">Impact 5</span></span></span><span class="sec"><span class="sl">Status</span><span class="st u">Under consideration</span></span><span class="badges"></span></button><button class="idea" data-no="10" data-ready="3.5" data-ca="3"><span class="n">10</span><span class="t">System for Estimating Simulation Confidence per Site Zone From Sensor Gap Statistics</span><span class="sec"><span class="sl">Evaluation</span><span class="pills"><span class="pill s r1" title="Novelty / non-obviousness">N 4</span><span class="pill s r1" title="Completeness for filing">C 3</span><span class="pill r1" title="Readiness for drafting">R 3.5</span><span class="pill s ca r1" title="Business impact (competitive advantage for Workbench): Low">Impact 3</span></span></span><span class="sec"><span class="sl">Status</span><span class="st o">On hold</span></span><span class="badges"></span></button><button class="idea" data-no="11" data-ready="5.3" data-ca="7"><span class="n">11</span><span class="t">System for Simulating the Effect of a Proposed Fleet Update on Site Output Before Release</span><span class="sec"><span class="sl">Evaluation</span><span class="pills"><span class="pill s r4" title="Novelty / non-obviousness">N 7</span><span class="pill s r1" title="Completeness for filing">C 4</span><span class="pill r2" title="Readiness for drafting">R 5.3</span><span class="pill s ca r4" title="Business impact (competitive advantage for Workbench): High">Impact 7</span></span></span><span class="sec"><span class="sl">Status</span><span class="st u">Under consideration</span></span><span class="badges"></span></button><button class="idea" data-no="12" data-ready="7.0" data-ca="8" data-cmt="3"><span class="n">12</span><span class="t">Method for Generating a Safety Test Set for a Robot Software Release From the Robot's Safety Requirements and Recent Incidents</span><span class="sec"><span class="sl">Evaluation</span><span class="pills"><span class="pill s r4" title="Novelty / non-obviousness">N 7</span><span class="pill s r4" title="Completeness for filing">C 7</span><span class="pill r4" title="Readiness for drafting">R 7.0</span><span class="pill s ca r4" title="Business impact (competitive advantage for Workbench): High">Impact 8</span></span></span><span class="sec"><span class="sl">Status</span><span class="st c">Preparing slide for Patent committee</span></span><span class="badges"></span></button></div></div></div></section><section class="group" style="width:614px"><div class="ghead"><h2><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 16.5v-4.2a1.5 1.5 0 0 1 1.5-1.5h3.2l2-3.3h4.6v3.3H16a1.5 1.5 0 0 1 1.5 1.5v4.2Z"/><circle cx="6.5" cy="18" r="2.2"/><circle cx="14" cy="18" r="2.2"/><path d="M18.6 6.4a3.4 3.4 0 0 1 1.9 3M18.9 3a6.8 6.8 0 0 1 4.1 6"/><circle cx="18" cy="7.6" r=".9"/></svg>Field testing and observation</h2><span class="gmeta">8 ideas &middot; 2 clusters &middot; average readiness for patenting R 5.7</span></div><div class="crow"><div class="ccol"><div class="cnode"><h3>Updates</h3><div class="cmeta"><span>5 ideas</span><span class="cev">Average readiness for patenting <span class="pill r4" title="Average readiness for patenting of the ideas in this cluster">R 6.6</span></span></div></div><div class="leaves"><button class="idea" data-no="13" data-ready="7.5" data-ca="8" data-prio="1" data-cmt="2"><span class="n">13</span><span class="t">Method for Rolling Out a Software Update to a Robot Fleet in Stages Ordered by Each Robot's Task Risk and Battery State</span><span class="sec"><span class="sl">Evaluation</span><span class="pills"><span class="pill s r4" title="Novelty / non-obviousness">N 7</span><span class="pill s r4" title="Completeness for filing">C 8</span><span class="pill r4" title="Readiness for drafting">R 7.5</span><span class="pill s ca r4" title="Business impact (competitive advantage for Workbench): High">Impact 8</span></span></span><span class="sec"><span class="sl">Status</span><span class="st c">Preparing slide for Patent committee</span></span><span class="badges"></span></button><button class="idea" data-no="14" data-ready="6.5" data-ca="7" data-draft="1"><span class="n">14</span><span class="t">System for Automatically Rolling Back a Robot Software Update When Task Completion Metrics Drop Below a Learned Baseline</span><span class="sec"><span class="sl">Evaluation</span><span class="pills"><span class="pill s r3" title="Novelty / non-obviousness">N 6</span><span class="pill s r4" title="Completeness for filing">C 7</span><span class="pill r4" title="Readiness for drafting">R 6.5</span><span class="pill s ca r4" title="Business impact (competitive advantage for Workbench): High">Impact 7</span></span></span><span class="sec"><span class="sl">Status</span><span class="st a">Drafting</span></span><span class="badges"></span></button><button class="idea" data-no="15" data-ready="5.5" data-ca="4"><span class="n">15</span><span class="t">Method for Choosing the Update Time Window for Each Robot From Its Predicted Idle Periods</span><span class="sec"><span class="sl">Evaluation</span><span class="pills"><span class="pill s r2" title="Novelty / non-obviousness">N 5</span><span class="pill s r3" title="Completeness for filing">C 6</span><span class="pill r3" title="Readiness for drafting">R 5.5</span><span class="pill s ca r1" title="Business impact (competitive advantage for Workbench): Low">Impact 4</span></span></span><span class="sec"><span class="sl">Status</span><span class="st u">Under consideration</span></span><span class="badges"></span></button><button class="idea" data-no="16" data-ready="6.0" data-ca="5"><span class="n">16</span><span class="t">System for Verifying a Robot Software Update Against the Robot's Physical Configuration Before Installation</span><span class="sec"><span class="sl">Evaluation</span><span class="pills"><span class="pill s r3" title="Novelty / non-obviousness">N 6</span><span class="pill s r3" title="Completeness for filing">C 6</span><span class="pill r3" title="Readiness for drafting">R 6.0</span><span class="pill s ca r2" title="Business impact (competitive advantage for Workbench): Medium">Impact 5</span></span></span><span class="sec"><span class="sl">Status</span><span class="st u">Under consideration</span></span><span class="badges"></span></button><button class="idea" data-no="17" data-ready="7.5" data-ca="9" data-prio="1" data-cmt="1"><span class="n">17</span><span class="t">Method for Delivering Software Updates to Robots With Intermittent Connectivity by Robot-to-Robot Relay</span><span class="sec"><span class="sl">Evaluation</span><span class="pills"><span class="pill s r4" title="Novelty / non-obviousness">N 8</span><span class="pill s r4" title="Completeness for filing">C 7</span><span class="pill r4" title="Readiness for drafting">R 7.5</span><span class="pill s ca r4" title="Business impact (competitive advantage for Workbench): Very high">Impact 9</span></span></span><span class="sec"><span class="sl">Status</span><span class="st c">Preparing slide for Patent committee</span></span><span class="badges"></span></button></div></div><div class="ccol"><div class="cnode"><h3>Learning from field use</h3><div class="cmeta"><span>3 ideas</span><span class="cev">Average readiness for patenting <span class="pill r1" title="Average readiness for patenting of the ideas in this cluster">R 4.3</span></span></div></div><div class="leaves"><button class="idea" data-no="18" data-ready="5.9" data-ca="7"><span class="n">18</span><span class="t">System for Converting a Field Incident Report Into a Reproducible Simulation Scenario</span><span class="sec"><span class="sl">Evaluation</span><span class="pills"><span class="pill s r4" title="Novelty / non-obviousness">N 7</span><span class="pill s r2" title="Completeness for filing">C 5</span><span class="pill r3" title="Readiness for drafting">R 5.9</span><span class="pill s ca r4" title="Business impact (competitive advantage for Workbench): High">Impact 7</span></span></span><span class="sec"><span class="sl">Status</span><span class="st u">Under consideration</span></span><span class="badges"></span></button><button class="idea" data-no="19" data-ready="3.5" data-ca="2"><span class="n">19</span><span class="t">Method for Grouping Field Incidents by the Software Module Involved</span><span class="sec"><span class="sl">Evaluation</span><span class="pills"><span class="pill s r1" title="Novelty / non-obviousness">N 3</span><span class="pill s r1" title="Completeness for filing">C 4</span><span class="pill r1" title="Readiness for drafting">R 3.5</span><span class="pill s ca r0" title="Business impact (competitive advantage for Workbench): Very low">Impact 2</span></span></span><span class="sec"><span class="sl">Status</span><span class="st o">On hold</span></span><span class="badges"></span></button><button class="idea" data-no="20" data-ready="3.5" data-ca="3"><span class="n">20</span><span class="t">System for Ranking Open Incidents by Their Expected Effect on the Next Release</span><span class="sec"><span class="sl">Evaluation</span><span class="pills"><span class="pill s r1" title="Novelty / non-obviousness">N 4</span><span class="pill s r1" title="Completeness for filing">C 3</span><span class="pill r1" title="Readiness for drafting">R 3.5</span><span class="pill s ca r1" title="Business impact (competitive advantage for Workbench): Low">Impact 3</span></span></span><span class="sec"><span class="sl">Status</span><span class="st u">Under consideration</span></span><span class="badges"></span></button></div></div></div></section></div></div></div></div>
+    <footer>
+      Readiness is the geometric mean of the novelty/non-obviousness score and the
+      completeness-for-filing score, so a weak score in either dimension pulls the result down.
+      Red marks business impact above the chosen threshold, yellow marks readiness above the chosen threshold, and grey marks ideas already with the patent agents (drafting, filed).
+      <b>No prior-art search has been run against any patent database.</b>
+      Imaginary example: no real invention, person or company is described.<br>Created by Stanislav Aleksandrov.
+    </footer>
+  </main>
+</div>
+</div>
+</div>
+<div class="backdrop" id="backdrop" role="dialog" aria-modal="true" aria-labelledby="pane">
+  <div class="modal" id="modal">
+    <button id="close" aria-label="Close">&times;</button>
+    <div id="pane"></div>
+    <div class="mnav">
+      <button type="button" id="prev">&larr; previous</button>
+      <button type="button" id="next">next &rarr;</button>
+      <span class="hint">Esc closes &middot; arrow keys move</span>
+    </div>
+<script>
+const D = {"1": {"no": "1", "old": "1", "sub": "Development environment", "cluster": "Builds and test selection", "family": "", "status": "Under consideration", "title": "Capability manifest build", "ptitle": "Method for Compiling One Robot Software Build for Multiple Hardware Revisions Using a Capability Manifest", "summary": "Each robot revision in the field carries a small file listing what its hardware can do: sensors, steering type, top speed. The build system reads these manifests and produces one build whose features switch on or off per revision. Fully described, and a prototype runs on the build server, but Kenji Watanabe and Lena Bauer agreed that similar approaches are common in embedded software.", "abstract": "A method for producing one software build for several hardware revisions of a robot. Each revision carries a capability manifest listing its sensors, actuators and limits. At build time the method reads the manifests of the target revisions and compiles one build in which features are enabled or disabled per revision according to the manifest, with a check that every enabled feature has the capabilities it requires.", "people": "Kenji Watanabe (hardware platform lead, originator); Lena Bauer (release engineering)", "src": "Design review deck, 5 Mar 2026, slide 9 | Design_review_05032026 \\ workbench_design_review_v3.pptx\nCode repository fleet-updater, design notes as of 6 Apr 2026, docs/manifest.md | Repositories \\ fleet-updater \\ docs", "nov": 5, "comp": 8, "ready": 6.3, "ca": 4, "careason": "Saves the team effort, but a rival with a different build system loses nothing by not having it.", "notes": "Decision (complete but ordinary): Easy to draft tomorrow, hard to defend as new. Spend attorney budget on it? Options considered: (1) File it: it is cheap to draft and documents the approach. (2) Do not file; keep a dated design note as our own prior art. (3) Look for one unusual detail and file narrowly on that. Decided: Not filed. A dated design note is kept so that nobody else can patent the same thing against us."}, "2": {"no": "2", "old": "2", "sub": "Development environment", "cluster": "Builds and test selection", "family": "", "status": "Under consideration", "title": "Serial-number mismatch check", "ptitle": "System for Detecting a Hardware Revision Mismatch at Build Time From Part Serial Numbers", "summary": "", "abstract": "", "people": "", "src": "", "nov": 4, "comp": 7, "ready": 5.3, "ca": 2, "careason": "A safety net for our own process; no customer-visible advantage.", "notes": "", "mini": 1}, "3": {"no": "3", "old": "3", "sub": "Development environment", "cluster": "Builds and test selection", "family": "", "status": "Preparing slide for Patent committee", "title": "Change-aware test selection", "ptitle": "Method for Selecting Which Simulation Tests to Run Based on the Code Changed and the Robot Parts Affected", "summary": "", "abstract": "", "people": "", "src": "", "nov": 7, "comp": 7, "ready": 7.0, "ca": 8, "careason": "Test queues are the bottleneck every robot software team complains about; selecting tests by hardware revision as well as by code change is specific to robot fleets and absent from general test tools.", "notes": "", "mini": 1, "cmt": 4}, "4": {"no": "4", "old": "5", "sub": "Development environment", "cluster": "Developer assistance", "family": "", "status": "Under consideration", "title": "Describe-then-verify assistant", "ptitle": "System for Proposing Code Changes From a Robot Behaviour Description and Verifying Them in Simulation Before Presentation", "summary": "A developer describes the wanted behaviour in plain words ('slow down when a person walks within ten metres of the end of a row'). The system drafts the code change, runs it in simulation and shows the developer only the changes that passed. What happens when nothing passes, and how the description is tied to a test, were left open.", "abstract": "A system for proposing code changes to robot software from a plain-language description of a wanted behaviour. The system generates one or more candidate changes, runs each candidate in simulation against scenarios derived from the description, and presents to the developer only the candidates that pass, together with the scenarios they passed.", "people": "Mira Okafor (head of robotics software, originator); Jonas Lindqvist (fleet software lead)", "src": "Brainstorm 3, 19 Mar 2026, 14:00-15:30 CET (13:00 UTC), 90 min, at 01:02:10 | Brainstorm_19032026 \\ GMT20260319-130001_Recording.mp4\nReview call with M. Okafor, 23 Apr 2026, 09:00-09:45 CEST (07:00 UTC), 45 min, at 00:33:15 | Review_Okafor_23042026 \\ GMT20260423-070004_Recording.mp4", "nov": 6, "comp": 4, "ready": 4.9, "ca": 6, "careason": "Would change how robot behaviour is written; crowded field, so the simulation-verified presentation is the part worth protecting.", "notes": ""}, "5": {"no": "5", "old": "6", "sub": "Development environment", "cluster": "Developer assistance", "family": "", "status": "Under consideration", "title": "Failure explainer", "ptitle": "Method for Explaining a Failed Simulation Run by Linking the Failure to the Code Change Most Likely Responsible", "summary": "", "abstract": "", "people": "", "src": "", "nov": 7, "comp": 5, "ready": 5.9, "ca": 8, "careason": "Cuts the time from a failed test to a fix from hours to minutes; comparing sensor traces between runs is specific to robot software and hard to bolt onto a general tool.", "notes": "", "mini": 1, "prio": "23 Apr: “this is the thing developers would notice first.”"}, "6": {"no": "6", "old": "9", "sub": "Development environment", "cluster": "Developer assistance", "family": "", "status": "Under consideration", "title": "Hardware-change impact map", "ptitle": "System for Linking a Hardware Design Change to the Software Modules and Tests It Affects", "summary": "", "abstract": "", "people": "", "src": "", "nov": 6, "comp": 6, "ready": 6.0, "ca": 8, "careason": "Hardware and software teams at every robot maker lose weeks to unannounced part changes; a tool that links the two sells itself to engineering managers, and the link table built from past changes is hard to copy.", "notes": "", "mini": 1}, "7": {"no": "7", "old": "11", "sub": "Development environment", "cluster": "Simulation", "family": "F1 - Simulation built from fleet data", "status": "Drafting", "title": "Sim calibration from fleet logs", "ptitle": "System and Method for Calibrating a Robot Simulation Model Using Logged Sensor Data From Deployed Robots", "summary": "Robots in the field already log what their sensors see. The idea feeds those logs back into the simulator so that simulated wheel slip on wet soil, camera glare and lidar dropouts in dust match the real sites. The simulator is re-fitted every week; the developer sees how far the current model is from the last fit. Completeness rose from 6 to 7 after the 23 Apr review, when the re-fit schedule and the drift measure were written down.", "abstract": "A system receives sensor logs from a plurality of deployed robots, extracts per-sensor error statistics by operating zone, and fits noise and dynamics parameters of a simulation model to the statistics. The fitted model is versioned and compared with the previous version; a developer interface reports the parameter change and marks test results produced under a model older than a configurable age.", "people": "Priya Raman (simulation engineer, originator); Mira Okafor (head of robotics software)", "src": "Brainstorm 1, 12 Feb 2026, 10:00-11:05 CET (09:00 UTC), 65 min, at 00:14:20 | Brainstorm_12022026 \\ GMT20260212-090003_Recording.mp4\nChat thread #sim-fidelity, 24 Mar - 2 Apr 2026, 24 Mar, 16:42 | Chat_sim-fidelity \\ sim-fidelity_export.txt\nReview call with M. Okafor, 23 Apr 2026, 09:00-09:45 CEST (07:00 UTC), 45 min, at 00:08:05 | Review_Okafor_23042026 \\ GMT20260423-070004_Recording.mp4", "nov": 7, "comp": 7, "ready": 7.0, "ca": 7, "careason": "Trustworthy simulation is what lets a customer skip days of hardware testing per release; generic simulators do not learn from the customer's own fleet.", "notes": "Approved by the patent committee in the March round. Invention disclosure form finished on 12 May 2026; the patent attorneys began drafting on 16 May. F1: No. 8 may become a dependent claim or a second filing."}, "8": {"no": "8", "old": "12", "sub": "Development environment", "cluster": "Simulation", "family": "F1 - Simulation built from fleet data", "status": "Under consideration", "title": "Near-miss to test case", "ptitle": "Method for Generating Edge-Case Test Scenarios for Robot Software From Recorded Near-Miss Events", "summary": "", "abstract": "", "people": "", "src": "", "nov": 8, "comp": 5, "ready": 6.3, "ca": 7, "careason": "A test set that grows from the customer's own near misses is hard for a rival to copy without the same fleet data.", "notes": "", "mini": 1}, "9": {"no": "9", "old": "13", "sub": "Development environment", "cluster": "Simulation", "family": "", "status": "Under consideration", "title": "Sim-to-real trust flag", "ptitle": "System for Estimating the Gap Between Simulated and Real Sensor Readings and Flagging Untrustworthy Test Results", "summary": "", "abstract": "", "people": "", "src": "", "nov": 6, "comp": 5, "ready": 5.5, "ca": 5, "careason": "Useful inside the product, but the value shows only together with No. 7; on its own it is a warning label.", "notes": "", "mini": 1}, "10": {"no": "10", "old": "14", "sub": "Development environment", "cluster": "Simulation", "family": "", "status": "On hold", "title": "Zone confidence score", "ptitle": "System for Estimating Simulation Confidence per Site Zone From Sensor Gap Statistics", "summary": "", "abstract": "", "people": "", "src": "", "nov": 4, "comp": 3, "ready": 3.5, "ca": 3, "careason": "Reporting only; nothing a customer would choose the product for.", "notes": "", "mini": 1}, "11": {"no": "11", "old": "16", "sub": "Development environment", "cluster": "Simulation", "family": "", "status": "Under consideration", "title": "Throughput preview", "ptitle": "System for Simulating the Effect of a Proposed Fleet Update on Site Output Before Release", "summary": "", "abstract": "", "people": "", "src": "", "nov": 7, "comp": 4, "ready": 5.3, "ca": 7, "careason": "Expected output before release is the first question every site manager asks; nobody offers it today, which is also why it is incomplete.", "notes": "", "mini": 1}, "12": {"no": "12", "old": "17", "sub": "Development environment", "cluster": "Simulation", "family": "", "status": "Preparing slide for Patent committee", "title": "Safety test set generator", "ptitle": "Method for Generating a Safety Test Set for a Robot Software Release From the Robot's Safety Requirements and Recent Incidents", "summary": "", "abstract": "", "people": "", "src": "", "nov": 7, "comp": 7, "ready": 7.0, "ca": 8, "careason": "A safety case that updates itself from the field is what certification bodies and large customers ask for; nobody in the segment offers it as part of the developer tools.", "notes": "", "mini": 1, "cmt": 3}, "13": {"no": "13", "old": "20", "sub": "Field testing and observation", "cluster": "Updates", "family": "F2 - Rollout ordering and pausing", "status": "Preparing slide for Patent committee", "title": "Risk-ordered staged rollout", "ptitle": "Method for Rolling Out a Software Update to a Robot Fleet in Stages Ordered by Each Robot's Task Risk and Battery State", "summary": "Robots are updated in waves. The first wave is chosen from robots doing low-risk work (empty runs, charging) with enough battery to re-install if the update fails. Each wave must reach a task-completion threshold before the next one starts. Prototype shown on video on 9 Apr.", "abstract": "A method assigns each robot of a fleet a risk score from its current task class and a recovery score from its battery state, forms a first update wave from robots below a risk threshold and above a recovery threshold, installs the update on the wave, and admits the next wave only when a task-completion metric of the updated robots exceeds a baseline for a dwell period. Wave size and dwell period are adjusted from the observed metric.", "people": "Jonas Lindqvist (fleet software lead, originator); Lena Bauer (release engineering)", "src": "Brainstorm 1, 12 Feb 2026, 10:00-11:05 CET (09:00 UTC), 65 min, at 00:33:40 | Brainstorm_12022026 \\ GMT20260212-090003_Recording.mp4\nCode repository fleet-updater, design notes as of 6 Apr 2026, docs/staged-rollout.md | Repositories \\ fleet-updater \\ docs\nDemo video, staged rollout prototype, 9 Apr 2026, 6 min, at 00:02:10 | Demo_09042026 \\ rollout_demo.mp4\nReview call with J. Lindqvist, 28 Apr 2026, 11:00-11:40 CEST (09:00 UTC), 40 min, at 00:04:30 | Review_Lindqvist_28042026 \\ GMT20260428-090001_Recording.mp4\nRanking call, 15 May 2026, 10:00-10:50 CEST (08:00 UTC), 50 min, at 00:06:50 | Ranking_15052026 \\ GMT20260515-080003_Recording.mp4", "nov": 7, "comp": 8, "ready": 7.5, "ca": 8, "careason": "Customers update during live operations; a rollout that never takes a loaded robot out of service is a selling point and a direct advantage over vendor tools that update a whole site at once.", "notes": "F2: No. 15 is a candidate dependent claim; No. 14 is already in drafting as its own application.", "cmt": 2, "prio": "15 May: “our customers will not accept an update that stops a loaded robot.” Asked for it to go to the committee in this round."}, "14": {"no": "14", "old": "21", "sub": "Field testing and observation", "cluster": "Updates", "family": "F2 - Rollout ordering and pausing", "status": "Drafting", "title": "Metric-triggered rollback", "ptitle": "System for Automatically Rolling Back a Robot Software Update When Task Completion Metrics Drop Below a Learned Baseline", "summary": "", "abstract": "", "people": "", "src": "", "nov": 6, "comp": 7, "ready": 6.5, "ca": 7, "careason": "The per-robot, per-shift baseline is what makes rollback safe on a live site; strong companion to No. 13 and a likely second filing.", "notes": "", "mini": 1}, "15": {"no": "15", "old": "22", "sub": "Field testing and observation", "cluster": "Updates", "family": "F2 - Rollout ordering and pausing", "status": "Under consideration", "title": "Idle-window scheduling", "ptitle": "Method for Choosing the Update Time Window for Each Robot From Its Predicted Idle Periods", "summary": "", "abstract": "", "people": "", "src": "", "nov": 5, "comp": 6, "ready": 5.5, "ca": 4, "careason": "Scheduling by predicted idle time is familiar; it matters as a dependent feature of No. 13, not as a product in itself.", "notes": "", "mini": 1}, "16": {"no": "16", "old": "24", "sub": "Field testing and observation", "cluster": "Updates", "family": "", "status": "Under consideration", "title": "Configuration-checked install", "ptitle": "System for Verifying a Robot Software Update Against the Robot's Physical Configuration Before Installation", "summary": "", "abstract": "", "people": "", "src": "", "nov": 6, "comp": 6, "ready": 6.0, "ca": 5, "careason": "Prevents expensive field failures; similar checks exist in device management, so the advantage is in the robot-specific configuration model.", "notes": "", "mini": 1}, "17": {"no": "17", "old": "25", "sub": "Field testing and observation", "cluster": "Updates", "family": "", "status": "Preparing slide for Patent committee", "title": "Robot-to-robot relay", "ptitle": "Method for Delivering Software Updates to Robots With Intermittent Connectivity by Robot-to-Robot Relay", "summary": "Robots in quarries, orchards and remote yards lose the network for long stretches. Robots that already have the update carry it and pass it to robots they meet, with each hop checked against a signature. The order of hops is chosen so that the update spreads along the routes robots actually drive. Completeness rose from 6 to 7 after the 28 Apr review settled the signature chain.", "abstract": "A method distributes a signed software update across a fleet of mobile robots with intermittent network connectivity. A first robot that holds the update detects proximity to a second robot, verifies the second robot's eligibility from a fleet manifest, transfers the update over a short-range link, and the second robot verifies the signature chain before installation. Carrier robots are selected from predicted route overlap so that the update reaches disconnected zones within a target time.", "people": "Jonas Lindqvist (fleet software lead, originator); Amara Diallo (field support engineer); Mira Okafor (head of robotics software)", "src": "Brainstorm 2, 26 Feb 2026, 10:00-11:20 CET (09:00 UTC), 80 min, at 00:29:15 | Brainstorm_26022026 \\ GMT20260226-090002_Recording.mp4\nE-mail thread, incident 0419 follow-up, 30 Apr 2026, message 4 | Incident_0419 \\ incident_0419_thread.eml\nReview call with J. Lindqvist, 28 Apr 2026, 11:00-11:40 CEST (09:00 UTC), 40 min, at 00:26:10 | Review_Lindqvist_28042026 \\ GMT20260428-090001_Recording.mp4\nRanking call, 15 May 2026, 10:00-10:50 CEST (08:00 UTC), 50 min, at 00:03:20 | Ranking_15052026 \\ GMT20260515-080003_Recording.mp4", "nov": 8, "comp": 7, "ready": 7.5, "ca": 9, "careason": "Remote sites are where customers lose the most time to failed updates; no fleet tool updates robots that are out of signal, and the route-based choice of carriers is hard to copy.", "notes": "Decision (which first): The budget covers three filings this quarter. No. 13 is more complete; this one is more novel and harder to copy. Which goes first? Options considered: (1) No. 13 first: it is ready and the prototype exists. (2) This one first: rivals face the same connectivity problem and the window may close. (3) Both, and push a third idea to the next quarter. Decided: This one first, No. 13 second. Readiness tells you what is easy to draft; business impact tells you what is worth drafting.", "cmt": 1, "prio": "28 Apr: “nobody else can update a robot that is out of signal.” 15 May: “file it first.”"}, "18": {"no": "18", "old": "28", "sub": "Field testing and observation", "cluster": "Learning from field use", "family": "", "status": "Under consideration", "title": "Incident to scenario", "ptitle": "System for Converting a Field Incident Report Into a Reproducible Simulation Scenario", "summary": "A field support engineer files an incident with logs and a short description. The system rebuilds the state of the site at that moment in the simulator and hands the developer a scenario that reproduces the incident. Close cousin of No. 8; kept apart because the input is a filed report, not an automatic event.", "abstract": "A system for converting a field incident report into a reproducible simulation scenario. From the logs attached to the report, the system reconstructs the state of the site, the robot and the obstacles at the time of the incident, builds a simulation scenario that reproduces the incident, and hands the scenario to the developer together with the report.", "people": "Amara Diallo (field support engineer, originator); Priya Raman (simulation engineer); Mira Okafor (head of robotics software)", "src": "E-mail thread, incident 0419 follow-up, 30 Apr 2026, message 2 | Incident_0419 \\ incident_0419_thread.eml\nReview call with M. Okafor, 23 Apr 2026, 09:00-09:45 CEST (07:00 UTC), 45 min, at 00:50:05 | Review_Okafor_23042026 \\ GMT20260423-070004_Recording.mp4\nReview call with T. Herrera, 7 May 2026, 15:00-15:35 CEST (13:00 UTC), 35 min, at 00:28:00 | Review_Herrera_07052026 \\ GMT20260507-130002_Recording.mp4", "nov": 7, "comp": 5, "ready": 5.9, "ca": 7, "careason": "Turns support tickets into tests; customers with their own developers would pay for it, and it feeds the safety test set of No. 12.", "notes": ""}, "19": {"no": "19", "old": "29", "sub": "Field testing and observation", "cluster": "Learning from field use", "family": "", "status": "On hold", "title": "Incident grouping", "ptitle": "Method for Grouping Field Incidents by the Software Module Involved", "summary": "", "abstract": "", "people": "", "src": "", "nov": 3, "comp": 4, "ready": 3.5, "ca": 2, "careason": "Any ticketing tool does this.", "notes": "", "mini": 1}, "20": {"no": "20", "old": "30", "sub": "Field testing and observation", "cluster": "Learning from field use", "family": "", "status": "Under consideration", "title": "Incident ranking", "ptitle": "System for Ranking Open Incidents by Their Expected Effect on the Next Release", "summary": "", "abstract": "", "people": "", "src": "", "nov": 4, "comp": 3, "ready": 3.5, "ca": 3, "careason": "Would be nice; nobody has asked for it.", "notes": "", "mini": 1}};
+const backdrop = document.getElementById('backdrop');
+const panel = document.getElementById('pane');
+const canvas = document.getElementById('canvas');
+const viewport = document.getElementById('viewport');
+const CANVAS_W = 1638;
+
+const AGENTS = ['Drafting', 'Filed'];
+function caLabel(v){ return v >= 9 ? 'Very high' : v >= 7 ? 'High' : v === 6 ? 'Medium-high' : v === 5 ? 'Medium' : v >= 3 ? 'Low' : 'Very low'; }
+function threshold(){ return parseFloat(document.getElementById('thr').value); }
+function impThreshold(){ return parseInt(document.getElementById('thr2').value, 10); }
+
+const EMPTY = '<span style="color:var(--muted)">&mdash;</span>';
+function render(no){
+  const d = D[no];
+  if(!d){ panel.innerHTML = '<p class="d-empty">Select an idea.</p>'; return; }
+  let flag = '';
+  if(d.cmt) flag += '<div class="d-flag c"><b>In the patent-committee deck.</b> Rank ' + d.cmt
+    + ' of 4 by competitive advantage; slide ' + (d.cmt + 1) + ' of Workbench_patent_committee_4_ideas.pptx.</div>';
+  if(d.prio) flag += '<div class="d-flag"><b>Flagged by Okafor.</b> ' + d.prio + '</div>';
+  if(AGENTS.indexOf(d.status) > -1) flag += '<div class="d-flag d"><b>' + d.status + '.</b> '
+    + 'The invention disclosure is with the patent agents.</div>';
+  if(d.ca > impThreshold())
+    flag += '<div class="d-flag"><b>Business impact above ' + impThreshold() + '.</b> ' + caLabel(d.ca) + ' (' + d.ca + ' of 10).</div>';
+  if(d.status === 'Under consideration' && d.ready > threshold())
+    flag += '<div class="d-flag h"><b>Readiness above ' + threshold().toFixed(1)
+    + '.</b> Scored on the meeting record, not on a prior-art search.</div>';
+  panel.innerHTML =
+    '<div class="d-no">IDEA ' + d.no
+    + (d.old === 'new' ? ' &middot; NEW, added 25 Sep'
+       : (String(d.old).indexOf('+') > -1 ? ' &middot; MERGED from former nos. ' + d.old
+       : (d.old !== d.no ? ' &middot; previously no. ' + d.old : ''))) + '</div>'
+    + '<div class="d-title">' + (d.ptitle || d.title) + '</div>'
+    + '<div class="d-path"><b>' + d.sub + '</b> &rsaquo; ' + d.cluster + '</div>'
+    + (d.family ? '<div class="d-fam">Merge family &middot; ' + d.family + '</div>' : '')
+    + '<div class="d-sec"><div class="d-sh">Evaluation</div>'
+    + '<div class="d-scores">'
+    +   '<div class="sc"><span>Novelty /<br>non-obviousness</span><b>' + d.nov + '</b></div>'
+    +   '<div class="sc"><span>Completeness<br>for filing</span><b>' + d.comp + '</b></div>'
+    +   '<div class="sc"><span>Business<br>impact</span><b>' + d.ca + '</b></div>'
+    +   '<div class="sc"><span>Readiness<br>for drafting</span><b>' + d.ready.toFixed(1) + '</b></div>'
+    + '</div>'
+    + '<div class="d-ca"><b>Business impact: ' + caLabel(d.ca) + ' (' + d.ca + ' of 10).</b> '
+    + d.careason + ' <span style="color:var(--muted)">Proposal for discussion, 18 May 2026.</span></div></div>'
+    + '<div class="d-sec"><div class="d-sh">Status</div>'
+    + '<div class="d-status"><b>' + d.status + '</b></div></div>'
+    + (flag ? '<div class="d-sec"><div class="d-sh">Remarks</div>' + flag + '</div>' : '')
+    + (d.abstract || d.mini ? '<div class="d-lab">Abstract (USPTO style)</div><div class="d-abs">' + (d.abstract || EMPTY) + '</div>'
+                  + '<div class="d-lab">Notes from the transcription</div>' : '')
+    + '<div class="d-sum">' + (d.summary || EMPTY) + '</div>'
+    + (d.notes ? '<div class="d-lab">Notes: merges and drafting</div><div class="d-val d-notes">' + d.notes + '</div>' : '')
+    + '<div class="d-lab">Who contributed</div><div class="d-val">' + (d.people || EMPTY) + '</div>'
+    + '<div class="d-lab">Where it came from</div><div class="d-val">' + (d.src ? String(d.src).split('\n').join('<br>') : EMPTY) + '</div>';
+}
+
+function paint(){
+  const t = threshold(), ti = impThreshold();
+  let n = 0, ni = 0;
+  document.querySelectorAll('.idea').forEach(function(el){
+    const hi = parseFloat(el.dataset.ready) > t, im = parseInt(el.dataset.ca, 10) > ti;
+    const dr = el.dataset.draft === '1';
+    if(hi) n++;
+    if(im) ni++;
+    el.classList.toggle('is-draft', dr);
+    el.classList.toggle('is-high', hi && !dr);
+    el.classList.toggle('is-imp', im && !dr);
+    const cm = el.dataset.cmt;
+    el.classList.toggle('is-cmt', !!cm);
+    el.querySelector('.badges').innerHTML =
+      (cm ? '<span class="tag c" title="In the patent-committee deck, rank ' + cm + ' of 4">COMMITTEE DECK ITEM ' + cm + '</span> ' : '')
+      + (im ? '<span class="tag i" title="Business impact above the threshold">IMPACT ABOVE ' + ti + '</span>' : '')
+      + (hi ? '<span class="tag h" title="Readiness for patenting above the threshold">R ABOVE ' + t.toFixed(1) + '</span>' : '');
+  });
+  document.querySelectorAll('.vchip').forEach(function(c){
+    c.classList.toggle('is-high', parseFloat(c.dataset.ready) > t);
+    c.classList.toggle('is-imp', parseInt(c.dataset.ca, 10) > ti);
+  });
+  document.getElementById('thrv').textContent = t.toFixed(1);
+  document.getElementById('thrn').textContent = n + (n === 1 ? ' idea' : ' ideas') + ' above it';
+  document.getElementById('thr2v').textContent = ti;
+  document.getElementById('thr2n').textContent = ni + (ni === 1 ? ' idea' : ' ideas') + ' above it';
+  if(current) render(current);
+}
+
+function filter(){
+  const q = document.getElementById('q').value.trim().toLowerCase();
+  const mode = document.querySelector('input[name=mode]:checked').value;
+  const t = threshold();
+  document.querySelectorAll('.idea').forEach(function(el){
+    const d = D[el.dataset.no];
+    const hay = (d.title+' '+(d.ptitle||'')+' '+d.summary+' '+d.people+' '+d.cluster+' '+d.sub).toLowerCase();
+    let ok = !q || hay.indexOf(q) > -1;
+    if(ok && mode === 'prio') ok = !!d.prio;
+    if(ok && mode === 'cmt') ok = !!d.cmt;
+    if(ok && mode === 'high') ok = d.ready > t || d.ca > impThreshold() || AGENTS.indexOf(d.status) > -1;
+    const sv = document.getElementById('stsel').value;
+    if(ok && sv) ok = (d.status === sv);
+    el.classList.toggle('dim', !ok);   // dimmed, not removed, so the tree keeps its shape
+  });
+  // a cluster, and a subproduct, with no idea left in view turns grey as a whole
+  document.querySelectorAll('.ccol').forEach(function(c){
+    c.classList.toggle('cdim', !c.querySelector('.idea:not(.dim)'));
+  });
+  document.querySelectorAll('section.group').forEach(function(g){
+    g.classList.toggle('gdim', !g.querySelector('.idea:not(.dim)'));
+  });
+}
+
+const sizer = document.getElementById('sizer');
+canvas.style.width = CANVAS_W + 'px';
+const NAT_H = canvas.offsetHeight;
+function setZoom(z){
+  canvas.style.transform = 'scale(' + z + ')';
+  sizer.style.width = (CANVAS_W * z) + 'px';
+  const nh = canvas.offsetHeight;   // measured now, after the tags have been drawn
+  sizer.style.height = (nh * z) + 'px';
+  viewport.style.height = (nh * z + 18) + 'px';
+  document.getElementById('zv').textContent = Math.round(z * 100) + '%';
+}
+// A single print sheet sized to the whole page content (Chrome honours @page size set at load time).
+(function(){
+  const st = document.createElement('style');
+  const hdr = document.querySelector('header.top'), ctl = document.querySelector('.controls'), ftr = document.querySelector('footer');
+  const pw = CANVAS_W + 24, ph = (hdr.offsetHeight - ctl.offsetHeight) + NAT_H + ftr.offsetHeight + 48;
+  st.textContent = '@media print{@page{size:' + pw + 'px ' + ph + 'px;margin:0}}';
+  document.head.appendChild(st);
+})();
+function fit(){
+  const z = Math.min(1, Math.max(0.2, (viewport.clientWidth - 20) / CANVAS_W));
+  document.getElementById('zoom').value = z.toFixed(2);
+  setZoom(z);
+}
+
+// order the ideas as they appear on the page, so the arrows walk the map
+const ORDER = Array.prototype.map.call(document.querySelectorAll('.idea'),
+  function(el){ return el.dataset.no; });
+let current = null;
+
+function openModal(no){
+  current = no;
+  render(no);
+  backdrop.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  const i = ORDER.indexOf(no);
+  document.getElementById('prev').disabled = (i <= 0);
+  document.getElementById('next').disabled = (i < 0 || i >= ORDER.length - 1);
+  document.getElementById('close').focus();
+  document.querySelectorAll('.idea').forEach(function(o){
+    o.setAttribute('aria-current', o.dataset.no === no ? 'true' : 'false'); });
+}
+function closeModal(){
+  backdrop.classList.remove('open');
+  document.body.style.overflow = '';
+  if(current){
+    const el = document.querySelector('.idea[data-no="' + current + '"]');
+    if(el){ el.setAttribute('aria-current','false'); el.focus(); }
+  }
+  current = null;
+}
+function step(delta){
+  const i = ORDER.indexOf(current);
+  if(i < 0) return;
+  const j = i + delta;
+  if(j < 0 || j >= ORDER.length) return;
+  openModal(ORDER[j]);
+}
+
+document.querySelectorAll('.idea').forEach(function(el){
+  el.addEventListener('click', function(){ openModal(el.dataset.no); });
+});
+document.getElementById('close').addEventListener('click', closeModal);
+document.getElementById('prev').addEventListener('click', function(){ step(-1); });
+document.getElementById('next').addEventListener('click', function(){ step(1); });
+backdrop.addEventListener('click', function(e){ if(e.target === backdrop) closeModal(); });
+document.addEventListener('keydown', function(e){
+  if(!backdrop.classList.contains('open')) return;
+  if(e.key === 'Escape'){ closeModal(); }
+  else if(e.key === 'ArrowLeft'){ step(-1); }
+  else if(e.key === 'ArrowRight'){ step(1); }
+});
+document.getElementById('thr').addEventListener('input', function(){ paint(); filter(); });
+document.getElementById('thr2').addEventListener('input', function(){ paint(); filter(); });
+document.getElementById('q').addEventListener('input', filter);
+document.getElementById('stsel').addEventListener('change', filter);
+document.querySelectorAll('input[name=mode]').forEach(function(r){
+  r.addEventListener('change', filter); });
+document.getElementById('zoom').addEventListener('input', function(e){
+  setZoom(parseFloat(e.target.value)); });
+document.getElementById('fit').addEventListener('click', fit);
+window.addEventListener('resize', function(){
+  setZoom(parseFloat(document.getElementById('zoom').value)); });
+document.getElementById('reset').addEventListener('click', function(){
+  document.getElementById('zoom').value = 1; setZoom(1); });
+// vortex: draw the funnel behind the stages and link the stages to the map's status filter
+function drawVortex(){
+  const st = document.querySelector('.vstage'), svg = document.querySelector('svg.vfunnel');
+  if(!st) return;
+  const Z = pageZoom(st), s0 = st.getBoundingClientRect(), NS = 'http://www.w3.org/2000/svg';
+  const s = {left: s0.left, top: s0.top, width: s0.width / Z, height: s0.height / Z};
+  const B = Array.from(st.querySelectorAll('.vband:not(.vhold)')).map(function(b){ const r = b.getBoundingClientRect();
+    return {l: (r.left - s.left) / Z, r: (r.right - s.left) / Z, t: (r.top - s.top) / Z, b: (r.bottom - s.top) / Z}; });
+  svg.setAttribute('viewBox', '0 0 ' + s.width + ' ' + s.height); svg.innerHTML = '';
+  const F = ['--v0','--v1','--v2','--v3','--v4','--v5','--v6'];
+  B.forEach(function(b, i){
+    const n = B[i + 1], cx = (b.l + b.r) / 2, bl = n ? n.l : b.l + 12, br = n ? n.r : b.r - 12, by = n ? n.t : b.b + 10, h = by - b.t;
+    const p = document.createElementNS(NS, 'path');
+    p.setAttribute('d', 'M' + b.l + ' ' + b.t + ' C ' + b.l + ' ' + (b.t + h * .55) + ', ' + bl + ' ' + (by - h * .35) + ', ' + bl + ' ' + by
+      + ' L ' + br + ' ' + by + ' C ' + br + ' ' + (by - h * .35) + ', ' + b.r + ' ' + (b.t + h * .55) + ', ' + b.r + ' ' + b.t + ' Z');
+    p.setAttribute('fill', 'var(' + F[i] + ')'); svg.appendChild(p);
+    for(let k = 1; k <= 2; k++){
+      const w = (b.r - b.l) - ((b.r - b.l) - (br - bl)) * k / 3, e = document.createElementNS(NS, 'ellipse');
+      e.setAttribute('cx', cx); e.setAttribute('cy', b.t + h * k / 3); e.setAttribute('rx', w / 2 - 4); e.setAttribute('ry', 7);
+      e.setAttribute('fill', 'none'); e.setAttribute('stroke', 'var(--swirl)'); e.setAttribute('stroke-width', '2');
+      e.setAttribute('stroke-dasharray', (w * .9) + ' ' + (w * .7)); e.setAttribute('stroke-dashoffset', k * w * .3); svg.appendChild(e);
+    }
+    const rim = document.createElementNS(NS, 'ellipse');
+    rim.setAttribute('cx', cx); rim.setAttribute('cy', b.t); rim.setAttribute('rx', (b.r - b.l) / 2); rim.setAttribute('ry', 9);
+    rim.setAttribute('fill', 'var(' + F[i] + ')'); rim.setAttribute('stroke', 'var(--rim)'); rim.setAttribute('stroke-width', '1.2');
+    svg.insertBefore(rim, svg.firstChild);
+  });
+  // on hold: a box beside the narrow part of the funnel, with a dashed arrow leaving the wide mouth
+  const hold = st.querySelector('.vhold');
+  if(hold && B.length > 4){
+    const side = B[4], top = B[0];
+    hold.style.top = side.t + 'px';
+    const hr = hold.getBoundingClientRect(), hx = (hr.left - s.left + hr.width / 2) / Z, hy = side.t;
+    const a = document.createElementNS(NS, 'path'), x0 = top.r - 10, y0 = (top.t + top.b) / 2;
+    a.setAttribute('d', 'M' + x0 + ' ' + y0 + ' C ' + (s.width - 2) + ' ' + (y0 + 20) + ', ' + (s.width - 2) + ' ' + (hy - 60) + ', ' + hx + ' ' + (hy - 4));
+    a.setAttribute('fill', 'none'); a.setAttribute('stroke', 'var(--muted)'); a.setAttribute('stroke-width', '1.4');
+    a.setAttribute('stroke-dasharray', '4 4'); svg.appendChild(a);
+    const h = document.createElementNS(NS, 'path');
+    h.setAttribute('d', 'M' + (hx - 4) + ' ' + (hy - 10) + ' L ' + hx + ' ' + (hy - 3) + ' L ' + (hx + 4) + ' ' + (hy - 10));
+    h.setAttribute('fill', 'none'); h.setAttribute('stroke', 'var(--muted)'); h.setAttribute('stroke-width', '1.4'); svg.appendChild(h);
+  }
+}
+function markStage(){
+  const v = document.getElementById('stsel').value;
+  document.querySelectorAll('.vx .vband').forEach(function(b){ b.classList.toggle('on', !!v && b.dataset.status === v); });
+}
+document.querySelectorAll('.vx .vband').forEach(function(b){
+  function pick(){ const sel = document.getElementById('stsel');
+    sel.value = (sel.value === b.dataset.status) ? '' : b.dataset.status; filter(); markStage(); }
+  b.addEventListener('click', function(e){ if(e.target.closest('.vchip')) return; pick(); });
+  b.addEventListener('keydown', function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); pick(); } });
+});
+document.querySelectorAll('.vchip').forEach(function(c){
+  c.addEventListener('click', function(){ openModal(c.dataset.no); }); });
+document.getElementById('stsel').addEventListener('change', markStage);
+function pageZoom(el){
+  // how much the page is scaled (Chrome reports it directly; otherwise compare sizes)
+  if(typeof el.currentCSSZoom === 'number') return el.currentCSSZoom;
+  const w = document.querySelector('.wrap'); return parseFloat(w.style.zoom) || 1;
+}
+const wrapEl = document.querySelector('.wrap');
+function fitPage(){
+  // Scale the whole page so that the header, the funnel and the map fit the window.
+  // Phones and narrow windows keep the normal size and scroll as before.
+  wrapEl.style.zoom = 1;
+  const vw = document.documentElement.clientWidth, vh = window.innerHeight;
+  if(vw < 1000){ drawVortex(); return; }
+  const vx = document.querySelector('.vx'), ft = document.querySelector('footer');
+  const W = 32 + vx.offsetWidth + 16 + CANVAS_W * (parseFloat(document.getElementById('zoom').value) || 1) + 4;
+  const H = wrapEl.offsetHeight - ft.offsetHeight - 16;
+  let z = Math.max(0.55, Math.min(1.25, vw / W, (vh - 4) / H));
+  // the header wraps less at a smaller zoom, so measure again and adjust
+  for(let k = 0; k < 3; k++){
+    wrapEl.style.zoom = z.toFixed(3);
+    const used = ft.getBoundingClientRect().top + window.scrollY - 8;
+    z = Math.max(0.55, Math.min(1.25, vw / W, z * (vh - 6) / used));
+  }
+  wrapEl.style.zoom = z.toFixed(3);
+  drawVortex();
+}
+let fitTimer = null;
+window.addEventListener('resize', function(){ clearTimeout(fitTimer); fitTimer = setTimeout(fitPage, 80); });
+paint(); setZoom(1); fitPage();
+</script>
+</body></html>
